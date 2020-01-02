@@ -6,8 +6,11 @@ contentTitle = sheet['E12']
 contentOutline = sheet['F12']
 print(contentTitle)
 title = contentTitle
-dd = __init__.createDoc(title)
-#body = {
+uu = __init__.updateDoc('1oxwp7Y19OUvbQx1H4xO04yVA43kS6dZMgpIlIcz_89U', contentTitle, contentOutline)
+print("Updated")
+#dd = __init__.createDoc(title)
+#cc = __init__.copyDoc('1Hrq6qITXuJXxofVrmV2HoD00uyBYkDXjaKAh9yAuKpg')
+#body =
 #    'title': title
 #}
 #doc = service.documents() \

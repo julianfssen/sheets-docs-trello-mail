@@ -171,6 +171,34 @@ def createDoc(title):
     print('Created document with title: {0}'.format(
         doc.get('title')))
 
+def copyDoc(fileId):
+    body = {
+        'name': 'Automated Document'
+    }
+    drive_response = DRIVE_SERVICE.files().copy(fileId=fileId, body=body).execute()
+    print('Copied File ID: %s' % drive_response.get('id'))
+
+def updateDoc(fileId, article_title, article_description):
+    requests = [
+        {
+            'replaceAllText': {
+                'containsText': {
+                    'text': '{{article_title}}',
+                    'matchCase': 'true'
+                },
+                'replaceText': article_title,
+            }}, {
+                'replaceAllText': {
+                    'containsText': {
+                        'text': '{{article_description}}',
+                        'matchCase': 'true'
+                    },
+                    'replaceText': article_description,
+                }
+            }
+    ]
+
+    result = DOCS_SERVICE.documents().batchUpdate(documentId=fileId, body={'requests': requests}).execute()
 
 class EZSheetsException(Exception):
     """The base class for all EZSheets-specific problems. If the ``ezsheets`` module raises something that isn't this
