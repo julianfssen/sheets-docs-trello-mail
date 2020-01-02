@@ -5,13 +5,6 @@ import os.path
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-
-ss = ezsheets.Spreadsheet('12vKZ3hVANpvvI-8eDzTg80YoCR85jIFXl8m6CGV44wU')
-sheet = ss[0]
-
-createTitle = sheet['E12']
-createBody = sheet['F12']
-
 if os.path.exists('token.pickle'):
     with open('token.pickle', 'rb') as token:
         creds = pickle.load(token)
@@ -26,48 +19,50 @@ if not creds or not creds.valid:
     # Save the credentials for the next run
     with open('token.pickle', 'wb') as token:
         pickle.dump(creds, token)
+ss = ezsheets.Spreadsheet('12vKZ3hVANpvvI-8eDzTg80YoCR85jIFXl8m6CGV44wU')
+sheet = ss[0]
 
-title = createTitle
+contentTitle = sheet['E12']
+contentOutline = sheet['F12']
+
+title = contentTitle
 body = {
     'title': title
-    "body": {
-    "content": [
-      {
-        "endIndex": 1,
-        "sectionBreak": {
-          "sectionStyle": {
-            "columnSeparatorStyle": "NONE",
-            "contentDirection": "LEFT_TO_RIGHT",
-            "sectionType": "CONTINUOUS"
-          }
-        }
-      },
-      {
-        "startIndex": 1,
-        "endIndex": 71,
-        "paragraph": {
-          "elements": [
-            {
-              "startIndex": 1,
-              "endIndex": 71,
-              "textRun": {
-                "content": "Greenbird’s Role In Achieving the Sustainable Development Goals (SDG)\n",
-                "textStyle": {}
-              }
-            }
-          ],
-          "paragraphStyle": {
-            "headingId": "h.o4qxnc456sgw",
-            "namedStyleType": "HEADING_1",
-            "alignment": "CENTER",
-            "direction": "LEFT_TO_RIGHT"
-          }
-        }
-      }
-
+}
+drive_response = drive_service.files().copy(
+    fileId=document_id, body=body).execute()
+document_copy_id = drive_response.get('1Hrq6qITXuJXxofVrmV2HoD00uyBYkDXjaKAh9yAuKpg')
 service = build('docs', 'v1', credentials=creds)
 doc = service.documents() \
     .create(body=body).execute()
 print('Created document with title: {0}'.format(
     doc.get('title')))
 docId = doc.get('documentId')
+
+requests = [
+        {
+        'insertText': {
+            'location': {
+                'index': 1
+            },
+            'text': contentOutline
+        }
+    }#,
+    #{
+    #    'updateTextStyle': {
+    #        'range': {
+    #            'startIndex': 1,
+    #            'endIndex': 66
+    #        },
+    #        'textStyle': {
+    #            'bold': True
+    #        },
+    #        'fields': 'bold'
+    #    }
+    #}
+]
+
+result = service.documents().batchUpdate(
+    documentId=docId, body={'requests': requests}).execute()
+
+
